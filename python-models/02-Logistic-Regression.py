@@ -29,8 +29,7 @@ class LogisticRegression:
             y_predict = self.sigmoid(np.dot(X, self.weights) + self.bias)
 
             # Step 3: Compute the cost over the whole training set.
-            cost = (- 1 / n_samples) * np.sum(y_true *
-                                              np.log(y_predict) + (1 - y_true) * (np.log(1 - y_predict)))
+            cost = (- 1 / n_samples) * np.sum(y_true * np.log(y_predict) + (1 - y_true) * (np.log(1 - y_predict)))
 
             # Step 4: Compute the gradients
             dw = (1 / n_samples) * np.dot(X.T, (y_predict - y_true))

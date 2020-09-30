@@ -1,311 +1,180 @@
+"""
+Implementation of a basic regression decision tree.
+Input data set: The input data set must be 1-dimensional with continuous labels.
+Output: The decision tree maps a real number input to a real number output.
+"""
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-np.random.seed(123)
 
 
-class DecisionTree:
-    """
-    Decision tree for regression
-    """
+class Decision_Tree:
+    def __init__(self, depth=5, min_leaf_size=5):
+        self.depth = depth
+        self.decision_boundary = 0
+        self.left = None
+        self.right = None
+        self.min_leaf_size = min_leaf_size
+        self.prediction = None
 
-    def __init__(self):
-        self.root_dict = None
-        self.tree_dict = None
-
-    def split_dataset(self, X, y, feature_idx, threshold):
+    def mean_squared_error(self, labels, prediction):
         """
-        Splits dataset X into two subsets, according to a given feature
-        and feature threshold.
-
-        Args:
-            X: 2D numpy array with data samples
-            y: 1D numpy array with labels
-            feature_idx: int, index of feature used for splitting the data
-            threshold: float, threshold used for splitting the data
-
-        Returns:
-            splits: dict containing the left and right subsets
-            and their labels
+        mean_squared_error:
+        @param labels: a one dimensional numpy array
+        @param prediction: a floating point value
+        return value: mean_squared_error calculates the error if prediction is used to
+            estimate the labels
+        >>> tester = Decision_Tree()
+        >>> test_labels = np.array([1,2,3,4,5,6,7,8,9,10])
+        >>> test_prediction = np.float(6)
+        >>> tester.mean_squared_error(test_labels, test_prediction) == (
+        ...     Test_Decision_Tree.helper_mean_squared_error_test(test_labels,
+        ...         test_prediction))
+        True
+        >>> test_labels = np.array([1,2,3])
+        >>> test_prediction = np.float(2)
+        >>> tester.mean_squared_error(test_labels, test_prediction) == (
+        ...     Test_Decision_Tree.helper_mean_squared_error_test(test_labels,
+        ...         test_prediction))
+        True
         """
+        if labels.ndim != 1:
+            print("Error: Input labels must be one dimensional")
 
-        left_idx = np.where(X[:, feature_idx] < threshold)
-        right_idx = np.where(X[:, feature_idx] >= threshold)
+        return np.mean((labels - prediction) ** 2)
 
-        left_subset = X[left_idx]
-        y_left = y[left_idx]
-
-        right_subset = X[right_idx]
-        y_right = y[right_idx]
-
-        splits = {
-            'left': left_subset,
-            'y_left': y_left,
-            'right': right_subset,
-            'y_right': y_right,
-        }
-
-        return splits
-
-    def mean_squared_error(self, y_left, y_right, n_left, n_right):
+    def train(self, X, y):
         """
-        Computes MSE of a split.
-
-        Args:
-            y_left, y_right: target values of samples in left/right subset
-            n_left, n_right: number of samples in left/right subset
-
-        Returns:
-            mse_left: float, MSE of left subset
-            mse_right: gloat, MSE of right subset
+        train:
+        @param X: a one dimensional numpy array
+        @param y: a one dimensional numpy array.
+        The contents of y are the labels for the corresponding X values
+        train does not have a return value
         """
 
-        mse_left, mse_right = 0, 0
-
-        if len(y_left) != 0:
-            y_hat_left = (1 / n_left) * np.sum(y_left)
-            mse_left = (1 / n_left) * np.sum((y_left - y_hat_left) ** 2)
-
-        if len(y_right) != 0:
-            y_hat_right = (1 / n_right) * np.sum(y_right)
-            mse_right = (1 / n_right) * np.sum((y_right - y_hat_right) ** 2)
-
-        return mse_left, mse_right
-
-    def get_cost(self, splits):
         """
-        Computes cost of a split given the MSE of the left
-        and right subset and the sizes of the subsets.
-
-        Args:
-            splits: dict, containing params of current split
+        this section is to check that the inputs conform to our dimensionality
+        constraints
         """
-        y_left = splits['y_left']
-        y_right = splits['y_right']
+        if X.ndim != 1:
+            print("Error: Input data set must be one dimensional")
+            return
+        if len(X) != len(y):
+            print("Error: X and y have different lengths")
+            return
+        if y.ndim != 1:
+            print("Error: Data set labels must be one dimensional")
+            return
 
-        n_left = len(y_left)
-        n_right = len(y_right)
-        n_total = n_left + n_right
+        if len(X) < 2 * self.min_leaf_size:
+            self.prediction = np.mean(y)
+            return
 
-        mse_left, mse_right = self.mean_squared_error(
-            y_left, y_right, n_left, n_right)
-        cost = (n_left / n_total) * mse_left + (n_right / n_total) * mse_right
+        if self.depth == 1:
+            self.prediction = np.mean(y)
+            return
 
-        return cost
+        best_split = 0
+        min_error = self.mean_squared_error(X, np.mean(y)) * 2
 
-    def find_best_split(self, X, y):
         """
-        Finds the best feature and feature index to split dataset X into
-        two groups. Checks every value of every attribute as a candidate
-        split.
-
-        Args:
-            X: 2D numpy array with data samples
-            y: 1D numpy array with labels
-
-        Returns:
-            best_split_params: dict, containing parameters of the best split
+        loop over all possible splits for the decision tree. find the best split.
+        if no split exists that is less than 2 * error for the entire array
+        then the data set is not split and the average for the entire array is used as
+        the predictor
         """
+        for i in range(len(X)):
+            if len(X[:i]) < self.min_leaf_size:
+                continue
+            elif len(X[i:]) < self.min_leaf_size:
+                continue
+            else:
+                error_left = self.mean_squared_error(X[:i], np.mean(y[:i]))
+                error_right = self.mean_squared_error(X[i:], np.mean(y[i:]))
+                error = error_left + error_right
+                if error < min_error:
+                    best_split = i
+                    min_error = error
 
-        n_samples, n_features = X.shape
-        best_feature_idx, best_threshold, best_cost, best_splits = np.inf, np.inf, np.inf, None
+        if best_split != 0:
+            left_X = X[:best_split]
+            left_y = y[:best_split]
+            right_X = X[best_split:]
+            right_y = y[best_split:]
 
-        for feature_idx in range(n_features):
-            for i in range(n_samples):
-                current_sample = X[i]
-                threshold = current_sample[feature_idx]
-                splits = self.split_dataset(X, y, feature_idx, threshold)
-                cost = self.get_cost(splits)
+            self.decision_boundary = X[best_split]
+            self.left = Decision_Tree(
+                depth=self.depth - 1, min_leaf_size=self.min_leaf_size
+            )
+            self.right = Decision_Tree(
+                depth=self.depth - 1, min_leaf_size=self.min_leaf_size
+            )
+            self.left.train(left_X, left_y)
+            self.right.train(right_X, right_y)
+        else:
+            self.prediction = np.mean(y)
 
-                if cost < best_cost:
-                    best_feature_idx = feature_idx
-                    best_threshold = threshold
-                    best_cost = cost
-                    best_splits = splits
+        return
 
-        best_split_params = {
-            'feature_idx': best_feature_idx,
-            'threshold': best_threshold,
-            'cost': best_cost,
-            'left': best_splits['left'],
-            'y_left': best_splits['y_left'],
-            'right': best_splits['right'],
-            'y_right': best_splits['y_right'],
-        }
-
-        return best_split_params
-
-    def build_tree(self, node_dict, depth, max_depth, min_samples):
+    def predict(self, x):
         """
-        Builds the decision tree in a recursive fashion.
-
-        Args:
-            node_dict: dict, representing the current node
-            depth: int, depth of current node in the tree
-            max_depth: int, maximum allowed tree depth
-            min_samples: int, minimum number of samples needed to split a node further
-
-        Returns:
-            node_dict: dict, representing the full subtree originating from current node
+        predict:
+        @param x: a floating point value to predict the label of
+        the prediction function works by recursively calling the predict function
+        of the appropriate subtrees based on the tree's decision boundary
         """
-        left_samples = node_dict['left']
-        right_samples = node_dict['right']
-        y_left_samples = node_dict['y_left']
-        y_right_samples = node_dict['y_right']
-
-        if len(y_left_samples) == 0 or len(y_right_samples) == 0:
-            node_dict["left_child"] = node_dict["right_child"] = self.create_terminal_node(
-                np.append(y_left_samples, y_right_samples))
+        if self.prediction is not None:
+            return self.prediction
+        elif self.left or self.right is not None:
+            if x >= self.decision_boundary:
+                return self.right.predict(x)
+            else:
+                return self.left.predict(x)
+        else:
+            print("Error: Decision tree not yet trained")
             return None
 
-        if depth >= max_depth:
-            node_dict["left_child"] = self.create_terminal_node(y_left_samples)
-            node_dict["right_child"] = self.create_terminal_node(
-                y_right_samples)
-            return None
 
-        if len(right_samples) < min_samples:
-            node_dict["right_child"] = self.create_terminal_node(
-                y_right_samples)
-        else:
-            node_dict["right_child"] = self.find_best_split(
-                right_samples, y_right_samples)
-            self.build_tree(
-                node_dict["right_child"],
-                depth + 1,
-                max_depth,
-                min_samples)
+class Test_Decision_Tree:
+    """Decision Tres test class"""
 
-        if len(left_samples) < min_samples:
-            node_dict["left_child"] = self.create_terminal_node(y_left_samples)
-        else:
-            node_dict["left_child"] = self.find_best_split(
-                left_samples, y_left_samples)
-            self.build_tree(
-                node_dict["left_child"],
-                depth + 1,
-                max_depth,
-                min_samples)
-
-        return node_dict
-
-    def create_terminal_node(self, y):
+    @staticmethod
+    def helper_mean_squared_error_test(labels, prediction):
         """
-        Creates a terminal node.
-
-        Args:
-            y: 1D numpy array with target values
-        Returns:
-            predicted_value: float, predicted value
+        helper_mean_squared_error_test:
+        @param labels: a one dimensional numpy array
+        @param prediction: a floating point value
+        return value: helper_mean_squared_error_test calculates the mean squared error
         """
-        return np.mean(y)
+        squared_error_sum = np.float(0)
+        for label in labels:
+            squared_error_sum += (label - prediction) ** 2
 
-    def train(self, X, y, max_depth, min_samples):
-        """
-        Fits decision tree on a given dataset.
-
-        Args:
-            X: 2D numpy array with data samples
-            y: 1D numpy array with labels
-            max_depth: int, maximum allowed tree depth
-            min_samples: int, minimum number of samples needed to split a node further
-        """
-        self.n_classes = len(set(y))
-        self.root_dict = self.find_best_split(X, y)
-        self.tree_dict = self.build_tree(
-            self.root_dict, 1, max_depth, min_samples)
-
-    def predict(self, X, node):
-        """
-        Predicts the class for a given input example X.
-
-        Args:
-            X: 1D numpy array, input example
-            node: dict, representing trained decision tree
-
-        Returns:
-            prediction: float, predicted value
-        """
-        feature_idx = node['feature_idx']
-        threshold = node['threshold']
-
-        if X[feature_idx] < threshold:
-            if isinstance(node['left_child'], (float)):
-                return node['left_child']
-            else:
-                prediction = self.predict(X, node['left_child'])
-        elif X[feature_idx] >= threshold:
-            if isinstance(node['right_child'], (float)):
-                return node['right_child']
-            else:
-                prediction = self.predict(X, node['right_child'])
-
-        return prediction
+        return np.float(squared_error_sum / labels.size)
 
 
-# Fetch data
-X = np.linspace(-3, 3, 400)
-y = X ** 2 + np.random.randn(400)
+def main():
+    """
+    In this demonstration we're generating a sample data set from the sin function in
+    numpy.  We then train a decision tree on the data set and use the decision tree to
+    predict the label of 10 different test values. Then the mean squared error over
+    this test is displayed.
+    """
+    X = np.arange(-1.0, 1.0, 0.005)
+    y = np.sin(X)
 
-plt.figure(figsize=(10, 8))
-plt.scatter(X, y)
-plt.title("Simple quadratic dataset with noise")
-plt.xlabel("Feature values")
-plt.ylabel("Target values")
+    tree = Decision_Tree(depth=10, min_leaf_size=10)
+    tree.train(X, y)
 
-X = X[:, np.newaxis]
+    test_cases = (np.random.rand(10) * 2) - 1
+    predictions = np.array([tree.predict(x) for x in test_cases])
+    avg_error = np.mean((predictions - test_cases) ** 2)
 
-# Split the data into a training and test set
-X_train, X_test, y_train, y_test = train_test_split(X, y)
-
-print(f'Shape X_train: {X_train.shape}')
-print(f'Shape y_train: {y_train.shape}')
-print(f'Shape X_test: {X_test.shape}')
-print(f'Shape y_test: {y_test.shape}')
-
-# Initializing and training the decision tree
-tree = DecisionTree()
-tree.train(X_train, y_train, max_depth=2, min_samples=2)
-
-# Printing the decision tree structure
+    print("Test values: " + str(test_cases))
+    print("Predictions: " + str(predictions))
+    print("Average error: " + str(avg_error))
 
 
-def print_tree(node, depth=0):
-    if isinstance(node, (float)):
-        print(f"{depth * '  '}predicted class: {round(node, 3)}")
-    else:
-        print(
-            f"{depth * '  '} feature {node['feature_idx']} < {round(node['threshold'], 3)}, "
-            f"cost of split: {round(node['cost'], 3)}")
-        print_tree(node["left_child"], depth + 1)
-        print_tree(node["right_child"], depth + 1)
+if __name__ == "__main__":
+    main()
+    import doctest
 
-
-print_tree(tree.tree_dict)
-
-# Testing the decision tree
-mse = 0
-predictions = []
-for i in range(X_test.shape[0]):
-    result = tree.predict(X_test[i], tree.tree_dict)
-    mse += (y_test[i] - result) ** 2
-    predictions.append(result)
-
-
-mse = (1 / len(y_test)) * mse
-print(f"MSE on test set: {round(mse, 3)}")
-
-# Plotting the predictions
-predictions = []
-for i in range(X.shape[0]):
-    result = tree.predict(X[i], tree.tree_dict)
-    predictions.append(result)
-
-plt.figure(figsize=(10, 8))
-plt.title("Decision tree predictions")
-plt.xlabel("Feature values")
-plt.ylabel("Target values")
-plt.scatter(X, y, label="target labels")
-plt.scatter(X, predictions, label="predicted labels")
-plt.legend(loc='upper right')
-plt.show()
+    doctest.testmod(name="mean_squarred_error", verbose=True)
