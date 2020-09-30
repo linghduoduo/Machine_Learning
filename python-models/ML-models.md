@@ -265,4 +265,3 @@ $$ MSE_m = \frac{1}{n_{m}} \sum_{i \in D_m} (y_i - \hat{y}_m)^2 $$
 - ![$y_i$](https://render.githubusercontent.com/render/math?math=y_i&mode=inline): target value of ![$i-$](https://render.githubusercontent.com/render/math?math=i-&mode=inline)th example
 
 Without regularization, decision trees are likely to overfit the training examples. This can be prevented using techniques like pruning or by providing a maximum allowed tree depth and/or a minimum number of samples required to split a node further.
-
