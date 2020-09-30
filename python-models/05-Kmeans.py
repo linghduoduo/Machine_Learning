@@ -285,6 +285,7 @@ def assign_clusters(data, centroids):
     # Compute distances between each data point and the set of centroids:
     # Fill in the blank (RHS only)
     distances_from_centroids = pairwise_distances(X, centroids, metric="euclidean")
+    # np.sqrt(sum((np.array(x) - np.array(y))**2))
 
     # Compute cluster assignments for each data point:
     # Fill in the blank (RHS only)
