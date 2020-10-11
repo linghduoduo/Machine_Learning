@@ -129,3 +129,63 @@ def tf_idf(tf: int, idf: int) -> float:
     0.954
     """
     return round(tf * idf, 3)
+
+
+    ### Spark implementation
+    # Step 1: Load the data
+    # Create and RDD of textFiles
+    # Using wholeTextFiles the created RDD has filename as Key and content as value
+    # The method takes numpartitions = 8 to set the parallelism of the application ﻿ ﻿
+    tech_text = sc.wholeTextFiles("/mnt/dataset/public/bbcnews/tech/",8) 
+
+
+    #Step 2: Compute TF-IDF - one variable at a time
+    number_of_docs = tech_text.count()
+
+
+    # term frequency
+    import re
+
+    def tokenize(s):
+      return re.split("\\W+", s.lower())
+
+    #We Tokenize the text
+    tokenized_text = tech_text.map(lambda (text,title): (title, tokenize(text)) )
+
+    #Count Words in each document
+    term_frequency = tokenized_text.flatMapValues(lambda x: x).countByValue()
+    term_frequency.items()[:20] # Display 20 lines
+
+    # document frequency
+
+    document_frequency = tokenized_text.flatMapValues(lambda x: x).distinct()\
+                        .map(lambda (title,word): (word,title)).countByKey()
+
+
+    document_frequency.items()[:10]
+
+    # compute tfidf
+    import numpy as np
+
+
+    def tf_idf(number_of_docs, term_frequency, document_frequency):
+        result = []
+        for key, value in tf.items():
+            doc = key[0]
+            term = key[1]
+            df = document_frequency[term]
+            if (df>0):
+              tf_idf = float(value)*np.log(number_of_docs/df)
+            
+            result.append({"doc":doc, "term":term, "score":tf_idf})
+        return result
+
+
+    tf_idf_output = tf_idf(number_of_docs, term_frequency, document_frequency)
+
+    tf_idf_output[:10]
+
+
+
+
+
