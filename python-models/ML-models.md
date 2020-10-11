@@ -1,12 +1,13 @@
 ##### 01 - Linear Regression
 
-$
+{\displaystyle
 \mathbf{w}=\left(\mathbf{X}^{T} \mathbf{X}\right)^{-1} \mathbf{X}^{T} \mathbf{y}
-$
+}
 
-$
+{\displaystyle
 J(\mathbf{w}, b)=\frac{1}{m} \sum_{i=1}^{m}\left(\hat{y}^{(i)}-y^{(i)}\right)^{2}
-$
+
+}
 
 $
 \begin{array}{l}{\nabla_{\mathbf{w}} J=\frac{2}{m} \mathbf{X}^{T} \cdot(\hat{\mathbf{y}}-\mathbf{y})} \\ {\nabla_{\mathbf{b}} J=\frac{2}{m}(\hat{\mathbf{y}}-\mathbf{y})}\end{array}
@@ -17,6 +18,20 @@ $
 $
 
 #### 02 - Logistic Regression
+
+Cross-entropy can be used to define a loss function in [machine learning](https://en.wikipedia.org/wiki/Machine_learning) and [optimization](https://en.wikipedia.org/wiki/Optimization). The true probability {\displaystyle p_{i}}![p_{i}](https://wikimedia.org/api/rest_v1/media/math/render/svg/5bab39399bf5424f25d957cdc57c84a0622626d2) is the true label, and the given distribution {\displaystyle q_{i}}![q_{i}](https://wikimedia.org/api/rest_v1/media/math/render/svg/2752dcbff884354069fe332b8e51eb0a70a531b6) is the predicted value of the current model.
+
+More specifically, consider [logistic regression](https://en.wikipedia.org/wiki/Logistic_regression), which (among other things) can be used to classify observations into two possible classes (often simply labelled {\displaystyle 0}![{\displaystyle 0}](https://wikimedia.org/api/rest_v1/media/math/render/svg/2aae8864a3c1fec9585261791a809ddec1489950) and {\displaystyle 1}![1](https://wikimedia.org/api/rest_v1/media/math/render/svg/92d98b82a3778f043108d4e20960a9193df57cbf)). The output of the model for a given observation, given a vector of input features {\displaystyle x}![x](https://wikimedia.org/api/rest_v1/media/math/render/svg/87f9e315fd7e2ba406057a97300593c4802b53e4), can be interpreted as a probability, which serves as the basis for classifying the observation. The probability is modeled using the [logistic function](https://en.wikipedia.org/wiki/Logistic_function) {\displaystyle g(z)=1/(1+e^{-z})}![g(z)=1/(1+e^{{-z}})](https://wikimedia.org/api/rest_v1/media/math/render/svg/dd04cb873b2f781ab5193c1e900feaabc135d22f) where {\displaystyle z}![z](https://wikimedia.org/api/rest_v1/media/math/render/svg/bf368e72c009decd9b6686ee84a375632e11de98) is some function of the input vector {\displaystyle x}![x](https://wikimedia.org/api/rest_v1/media/math/render/svg/87f9e315fd7e2ba406057a97300593c4802b53e4), commonly just a linear function. The probability of the output {\displaystyle y=1}![y=1](https://wikimedia.org/api/rest_v1/media/math/render/svg/10f53b404b1fdd041a589f1f2425e45a2edba110) is given by
+
+
+
+where the vector of weights {\displaystyle \mathbf {w} }![\mathbf {w} ](https://wikimedia.org/api/rest_v1/media/math/render/svg/20795664b5b048744a2fd88977851104cc5816f8) is optimized through some appropriate algorithm such as [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent). Similarly, the complementary probability of finding the output {\displaystyle y=0}![y=0](https://wikimedia.org/api/rest_v1/media/math/render/svg/094f824655138f6b11d96a0da32e7f0716ba6959) is simply given by
+
+
+
+Having set up our notation, {\displaystyle p\in \{y,1-y\}}![p\in \{y,1-y\}](https://wikimedia.org/api/rest_v1/media/math/render/svg/e3ab7d49ae71e4d41532ceabf91dfada3ed4774e) and {\displaystyle q\in \{{\hat {y}},1-{\hat {y}}\}}![q\in \{{\hat  {y}},1-{\hat  {y}}\}](https://wikimedia.org/api/rest_v1/media/math/render/svg/625742439e4971c3234ca3099238b310ca5edeb7), we can use cross-entropy to get a measure of dissimilarity between {\displaystyle p}![p](https://wikimedia.org/api/rest_v1/media/math/render/svg/81eac1e205430d1f40810df36a0edffdc367af36) and {\displaystyle q}![q](https://wikimedia.org/api/rest_v1/media/math/render/svg/06809d64fa7c817ffc7e323f85997f783dbdf71d):
+
+
 
 Logistic regression typically optimizes the log loss for all the observations on which it is trained, which is the same as optimizing the average cross-entropy in the sample. For example, suppose we have {\displaystyle N}![N](https://wikimedia.org/api/rest_v1/media/math/render/svg/f5e3890c981ae85503089652feb48b191b57aae3) samples with each sample indexed by {\displaystyle n=1,\dots ,N}![n=1,\dots ,N](https://wikimedia.org/api/rest_v1/media/math/render/svg/ad5340f154b80ccd58b1343c863880a8155a1d06). The *average* of the loss function is then given by:
 
@@ -53,8 +68,6 @@ The proof is as follows. For any {\displaystyle {\hat {y}}^{i}}![{\displaystyle 
 {\displaystyle {\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}](https://wikimedia.org/api/rest_v1/media/math/render/svg/5bd40cc4d7176b2b421f2257d3d02e03fff6f952)
 
 In a similar way, we eventually obtain the desired result.
-
-
 
 
 
