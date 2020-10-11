@@ -18,6 +18,46 @@ $
 
 #### 02 - Logistic Regression
 
+Logistic regression typically optimizes the log loss for all the observations on which it is trained, which is the same as optimizing the average cross-entropy in the sample. For example, suppose we have {\displaystyle N}![N](https://wikimedia.org/api/rest_v1/media/math/render/svg/f5e3890c981ae85503089652feb48b191b57aae3) samples with each sample indexed by {\displaystyle n=1,\dots ,N}![n=1,\dots ,N](https://wikimedia.org/api/rest_v1/media/math/render/svg/ad5340f154b80ccd58b1343c863880a8155a1d06). The *average* of the loss function is then given by:
+
+
+
+where {\displaystyle {\hat {y}}_{n}\equiv g(\mathbf {w} \cdot \mathbf {x} _{n})=1/(1+e^{-\mathbf {w} \cdot \mathbf {x} _{n}})}![{\displaystyle {\hat {y}}_{n}\equiv g(\mathbf {w} \cdot \mathbf {x} _{n})=1/(1+e^{-\mathbf {w} \cdot \mathbf {x} _{n}})}](https://wikimedia.org/api/rest_v1/media/math/render/svg/de49433a74b00a8caff2e5c13adaeee9ef99cabc), with {\displaystyle g(z)}![g(z)](https://wikimedia.org/api/rest_v1/media/math/render/svg/8eb6fb9c0f0d402f5ebbebfd5e34bedd39a4a52b) the logistic function as before.
+
+The logistic loss is sometimes called cross-entropy loss. It is also known as log loss (In this case, the binary label is often denoted by {-1,+1}).[[2\]](https://en.wikipedia.org/wiki/Cross_entropy#cite_note-2)
+
+**Remark:** The gradient of the cross-entropy loss for logistic regression is the same as the gradient of the squared error loss for [Linear regression](https://en.wikipedia.org/wiki/Linear_regression). That is, define
+
+{\displaystyle X^{T}={\begin{pmatrix}1&x_{11}&\dots &x_{1p}\\1&x_{21}&\dots &x_{2p}\\&&\dots \\1&x_{n1}&\dots &x_{np}\\\end{pmatrix}}\in \mathbb {R} ^{n\times (p+1)}}![{\displaystyle X^{T}={\begin{pmatrix}1&x_{11}&\dots &x_{1p}\\1&x_{21}&\dots &x_{2p}\\&&\dots \\1&x_{n1}&\dots &x_{np}\\\end{pmatrix}}\in \mathbb {R} ^{n\times (p+1)}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/f5749ac7e8134605c3545e9e42c16f9c3896ad67)
+
+{\displaystyle {\hat {y_{i}}}={\hat {f}}(x_{i1},\dots ,x_{ip})={\frac {1}{1+exp(-\beta _{0}-\beta _{1}x_{i1}-\dots -\beta _{p}x_{ip})}}}![{\displaystyle {\hat {y_{i}}}={\hat {f}}(x_{i1},\dots ,x_{ip})={\frac {1}{1+exp(-\beta _{0}-\beta _{1}x_{i1}-\dots -\beta _{p}x_{ip})}}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/c8feef5b3c20cae56e7917218a6f4ca23d2cccd5)
+
+{\displaystyle L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}[y^{i}\log {\hat {y}}^{i}+(1-y^{i})\log(1-{\hat {y}}^{i})]}![{\displaystyle L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}[y^{i}\log {\hat {y}}^{i}+(1-y^{i})\log(1-{\hat {y}}^{i})]}](https://wikimedia.org/api/rest_v1/media/math/render/svg/596a23552927b2ee6c05bfdd176e474834b0c1b1)
+
+Then we have the result
+
+{\displaystyle {\frac {\partial }{\partial {\overrightarrow {\beta }}}}L({\overrightarrow {\beta }})=X({\hat {Y}}-Y)}![{\displaystyle {\frac {\partial }{\partial {\overrightarrow {\beta }}}}L({\overrightarrow {\beta }})=X({\hat {Y}}-Y)}](https://wikimedia.org/api/rest_v1/media/math/render/svg/6d79d85bc7232de2b309fec41b792e5ab0db91c0)
+
+The proof is as follows. For any {\displaystyle {\hat {y}}^{i}}![{\displaystyle {\hat {y}}^{i}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/119f02bef981a64636032ff38e0ad83f01f5bc6f), we have
+
+{\displaystyle {\frac {\partial }{\partial \beta _{0}}}\ln {\frac {1}{1+e^{-\beta _{0}+k_{0}}}}={\frac {e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}}![{\displaystyle {\frac {\partial }{\partial \beta _{0}}}\ln {\frac {1}{1+e^{-\beta _{0}+k_{0}}}}={\frac {e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/d97553e3d273415fcd9629e2057f3f2030b2d301)
+
+{\displaystyle {\frac {\partial }{\partial \beta _{0}}}\ln \left(1-{\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right)={\frac {-1}{1+e^{-\beta _{0}+k_{0}}}}}![{\displaystyle {\frac {\partial }{\partial \beta _{0}}}\ln \left(1-{\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right)={\frac {-1}{1+e^{-\beta _{0}+k_{0}}}}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/caa173d300d2f202b787c964ec7ef9ff149bcf90)
+
+{\displaystyle {\begin{aligned}{\frac {\partial }{\partial \beta _{0}}}L({\overrightarrow {\beta }})&=-\sum _{i=1}^{N}\left[{\frac {y^{i}\cdot e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}-(1-y^{i}){\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right]\\&=-\sum _{i=1}^{N}[y^{i}-{\hat {y}}^{i}]=\sum _{i=1}^{N}({\hat {y}}^{i}-y^{i})\end{aligned}}}![{\displaystyle {\begin{aligned}{\frac {\partial }{\partial \beta _{0}}}L({\overrightarrow {\beta }})&=-\sum _{i=1}^{N}\left[{\frac {y^{i}\cdot e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}-(1-y^{i}){\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right]\\&=-\sum _{i=1}^{N}[y^{i}-{\hat {y}}^{i}]=\sum _{i=1}^{N}({\hat {y}}^{i}-y^{i})\end{aligned}}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/1c02e7f3551dd635964e2089931a939e1b1ba2a5)
+
+{\displaystyle {\frac {\partial }{\partial \beta _{1}}}\ln {\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}={\frac {x_{i1}e^{k_{1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}\ln {\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}={\frac {x_{i1}e^{k_{1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/3704a36e32d60f7236d7947f18e2ef635b9f9481)
+
+{\displaystyle {\frac {\partial }{\partial \beta _{1}}}\ln \left[1-{\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}\right]={\frac {-x_{i1}e^{\beta _{1}x_{i1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}\ln \left[1-{\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}\right]={\frac {-x_{i1}e^{\beta _{1}x_{i1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}](https://wikimedia.org/api/rest_v1/media/math/render/svg/0b33c567b55bc690ac5dd5b5c2e2d8b9d870c05c)
+
+{\displaystyle {\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}](https://wikimedia.org/api/rest_v1/media/math/render/svg/5bd40cc4d7176b2b421f2257d3d02e03fff6f952)
+
+In a similar way, we eventually obtain the desired result.
+
+
+
+
+
 $
 \hat{\mathbf{y}}=\sigma(\mathbf{a})=\frac{1}{1+\exp (-\mathbf{a})}
 $
