@@ -1,5 +1,5 @@
 ###########################################################
-## LR
+## LR Gradient Descent
 ###########################################################
 import numpy as np
 import matplotlib.pyplot as plt
@@ -60,12 +60,6 @@ class LinearRegression:
 # We will use a simple training set
 X = 2 * np.random.rand(500, 1)
 y = 5 + 3 * X + np.random.randn(500, 1)
-fig = plt.figure(figsize=(8, 6))
-plt.scatter(X, y)
-plt.title("Dataset")
-plt.xlabel("First feature")
-plt.ylabel("Second feature")
-plt.show()
 
 # Split the data into a training and test set
 X_train, X_test, y_train, y_test = train_test_split(X, y)
@@ -81,13 +75,6 @@ n_samples_test, _ = X_test.shape
 regressor = LinearRegression()
 w_trained, b_trained, costs = regressor.train_gradient_descent(
     X_train, y_train, learning_rate=0.005, n_iters=600)
-n_iters = 600
-fig = plt.figure(figsize=(8, 6))
-plt.plot(np.arange(n_iters), costs)
-plt.title("Development of cost during training")
-plt.xlabel("Number of iterations")
-plt.ylabel("Cost")
-plt.show()
 
 # Testing gradient descent
 n_samples, _ = X_train.shape
@@ -102,7 +89,10 @@ print(">>> Error for gradient descent")
 print(f"Error on training set: {np.round(error_train, 4)}")
 print(f"Error on test set: {np.round(error_test)}")
 
+
+###########################################################
 # Training with normal equation
+###########################################################
 # To compute the parameters using the normal equation, we add a bias value
 # of 1 to each input example
 X_b_train = np.c_[np.ones((n_samples)), X_train]
@@ -130,7 +120,6 @@ plt.scatter(X_test, y_p_test)
 plt.xlabel("First feature")
 plt.ylabel("Second feature")
 plt.show()
-
 
 
 """
