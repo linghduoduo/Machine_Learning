@@ -20,7 +20,7 @@ More specifically, consider [logistic regression](https://en.wikipedia.org/wiki/
 
 Having set up our notation, ${ p\in \{y,1-y\}}$ and ${ q\in \{{\hat {y}},1-{\hat {y}}\}}$, we can use cross-entropy to get a measure of dissimilarity between $ p $ and $ { q} $:
 
-Logistic regression typically optimizes the log loss for all the observations on which it is trained, which is the same as optimizing the average cross-entropy in the sample. For example, suppose we have {\displaystyle N}![N](https://wikimedia.org/api/rest_v1/media/math/render/svg/f5e3890c981ae85503089652feb48b191b57aae3) samples with each sample indexed by {\displaystyle n=1,\dots ,N}![n=1,\dots ,N](https://wikimedia.org/api/rest_v1/media/math/render/svg/ad5340f154b80ccd58b1343c863880a8155a1d06). The *average* of the loss function is then given by:
+Logistic regression typically optimizes the log loss for all the observations on which it is trained, which is the same as optimizing the average cross-entropy in the sample. For example, suppose we have ${ N}$ samples with each sample indexed by ${ n=1,\dots ,N}$. The *average* of the loss function is then given by:
 
 where 
 
@@ -48,13 +48,13 @@ ${ {\frac {\partial }{\partial \beta _{0}}}\ln {\frac {1}{1+e^{-\beta _{0}+k_{0}
 
 ${ {\frac {\partial }{\partial \beta _{0}}}\ln \left(1-{\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right)={\frac {-1}{1+e^{-\beta _{0}+k_{0}}}}}$
 
-${{\begin{aligned}{\frac {\partial }{\partial \beta _{0}}}L({\overrightarrow {\beta }})&=-\sum _{i=1}^{N}\left[{\frac {y^{i}\cdot e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}-(1-y^{i}){\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right]\\&=-\sum _{i=1}^{N}[y^{i}-{\hat {y}}^{i}]=\sum _{i=1}^{N}({\hat {y}}^{i}-y^{i})\end{aligned}}}![{\displaystyle {\begin{aligned}{\frac {\partial }{\partial \beta _{0}}}L({\overrightarrow {\beta }})&=-\sum _{i=1}^{N}\left[{\frac {y^{i}\cdot e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}-(1-y^{i}){\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right]\\&=-\sum _{i=1}^{N}[y^{i}-{\hat {y}}^{i}]=\sum _{i=1}^{N}({\hat {y}}^{i}-y^{i})\end{aligned}}}$
+${{\begin{aligned}{\frac {\partial }{\partial \beta _{0}}}L({\overrightarrow {\beta }})&=-\sum _{i=1}^{N}\left[{\frac {y^{i}\cdot e^{-\beta _{0}+k_{0}}}{1+e^{-\beta _{0}+k_{0}}}}-(1-y^{i}){\frac {1}{1+e^{-\beta _{0}+k_{0}}}}\right]\\&=-\sum _{i=1}^{N}[y^{i}-{\hat {y}}^{i}]=\sum _{i=1}^{N}({\hat {y}}^{i}-y^{i})\end{aligned}}}$
 
-${ {\frac {\partial }{\partial \beta _{1}}}\ln {\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}={\frac {x_{i1}e^{k_{1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}\ln {\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}={\frac {x_{i1}e^{k_{1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}$
+${ {\frac {\partial }{\partial \beta _{1}}}\ln {\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}={\frac {x_{i1}e^{k_{1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}$
 
-${ {\frac {\partial }{\partial \beta _{1}}}\ln \left[1-{\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}\right]={\frac {-x_{i1}e^{\beta _{1}x_{i1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}\ln \left[1-{\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}\right]={\frac {-x_{i1}e^{\beta _{1}x_{i1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}$
+${ {\frac {\partial }{\partial \beta _{1}}}\ln \left[1-{\frac {1}{1+e^{-\beta _{1}x_{i1}+k_{1}}}}\right]={\frac {-x_{i1}e^{\beta _{1}x_{i1}}}{e^{\beta _{1}x_{i1}}+e^{k_{1}}}}}$
 
-${{\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}$![{\displaystyle {\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}](https://wikimedia.org/api/rest_v1/media/math/render/svg/5bd40cc4d7176b2b421f2257d3d02e03fff6f952)
+${{\frac {\partial }{\partial \beta _{1}}}L({\overrightarrow {\beta }})=-\sum _{i=1}^{N}x_{i1}(y^{i}-{\hat {y}}^{i})=\sum _{i=1}^{N}x_{i1}({\hat {y}}^{i}-y^{i})}$
 
 In a similar way, we eventually obtain the desired result.
 
