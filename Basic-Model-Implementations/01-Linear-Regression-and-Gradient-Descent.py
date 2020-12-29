@@ -1,11 +1,111 @@
 ###########################################################
-## LR Gradient Descent
+# Training with normal equation
+###########################################################
+import numpy as np
+
+n = 100
+X = 2 * np.random.rand(n, 1)
+y = 4 + 3 * X + np.random.randn(n, 1)
+
+X_b = np.c_[np.ones((n, 1)), X]  # add x0 = 1 to each instance
+theta_best = np.linalg.inv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
+
+from sklearn.linear_model import LinearRegression
+
+lin_reg = LinearRegression()
+lin_reg.fit(X, y)
+lin_reg.intercept_, lin_reg.coef_
+
+## X_train
+# To compute the parameters using the normal equation, we add a bias value
+# of 1 to each input example
+X_b_train = np.c_[np.ones((n_samples)), X_train]
+X_b_test = np.c_[np.ones((n_samples_test)), X_test]
+
+reg_normal = LinearRegression()
+w_trained = reg_normal.train_normal_equation(X_b_train, y_train)
+
+# Testing normal equation
+y_p_train = reg_normal.predict(X_b_train)
+y_p_test = reg_normal.predict(X_b_test)
+
+error_train = (1 / n_samples) * np.sum((y_p_train - y_train) ** 2)
+error_test = (1 / n_samples_test) * np.sum((y_p_test - y_test) ** 2)
+print(">>> Error for Normal equation")
+print(f"Error on training set: {np.round(error_train, 4)}")
+print(f"Error on test set: {np.round(error_test, 4)}")
+
+
+###########################################################
+# Linear regression using batch gradient descent
+###########################################################
+eta = 0.1  # learning rate
+n_iterations = 1000
+
+theta = np.random.randn(2,1)  # random initialization
+
+for iteration in range(n_iterations):
+    gradients = 2/n * X_b.T.dot(X_b.dot(theta) - y)
+    theta = theta - eta * gradients
+
+    
+###########################################################
+# Stochastic Gradient Descent    
+###########################################################
+m = len(X_b)
+np.random.seed(42)
+n_epochs = 50
+t0, t1 = 5, 50  # learning schedule hyperparameters
+
+def learning_schedule(t):
+    return t0 / (t + t1)
+
+theta = np.random.randn(2,1)  # random initialization
+
+for epoch in range(n_epochs):
+    for i in range(m):
+        random_index = np.random.randint(m)
+        xi = X_b[random_index:random_index+1]
+        yi = y[random_index:random_index+1]
+        gradients = 2 * xi.T.dot(xi.dot(theta) - yi)
+        eta = learning_schedule(epoch * m + i)
+        theta = theta - eta * gradients              
+
+        
+###########################################################
+# Mini-batch gradient descent
+###########################################################
+n_iterations = 50
+minibatch_size = 20
+
+np.random.seed(42)
+theta = np.random.randn(2,1)  # random initialization
+
+t0, t1 = 200, 1000
+def learning_schedule(t):
+    return t0 / (t + t1)
+
+t = 0
+for epoch in range(n_iterations):
+    shuffled_indices = np.random.permutation(m)
+    X_b_shuffled = X_b[shuffled_indices]
+    y_shuffled = y[shuffled_indices]
+    for i in range(0, m, minibatch_size):
+        t += 1
+        xi = X_b_shuffled[i:i+minibatch_size]
+        yi = y_shuffled[i:i+minibatch_size]
+        gradients = 2/minibatch_size * xi.T.dot(xi.dot(theta) - yi)
+        eta = learning_schedule(t)
+        theta = theta - eta * gradients
+        theta_path_mgd.append(theta)
+
+###########################################################
+## LR Gradient Descent Class Implementations
 ###########################################################
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 np.random.seed(123)
-
 
 class LinearRegression:
 
@@ -56,7 +156,6 @@ class LinearRegression:
     def predict(self, X):
         return np.dot(X, self.weights) + self.bias
 
-
 # We will use a simple training set
 X = 2 * np.random.rand(500, 1)
 y = 5 + 3 * X + np.random.randn(500, 1)
@@ -90,41 +189,8 @@ print(f"Error on training set: {np.round(error_train, 4)}")
 print(f"Error on test set: {np.round(error_test)}")
 
 
-###########################################################
-# Training with normal equation
-###########################################################
-# To compute the parameters using the normal equation, we add a bias value
-# of 1 to each input example
-X_b_train = np.c_[np.ones((n_samples)), X_train]
-X_b_test = np.c_[np.ones((n_samples_test)), X_test]
-
-reg_normal = LinearRegression()
-w_trained = reg_normal.train_normal_equation(X_b_train, y_train)
-
-# Testing normal equation
-y_p_train = reg_normal.predict(X_b_train)
-y_p_test = reg_normal.predict(X_b_test)
-
-error_train = (1 / n_samples) * np.sum((y_p_train - y_train) ** 2)
-error_test = (1 / n_samples_test) * np.sum((y_p_test - y_test) ** 2)
-print(">>> Error for Normal equation")
-print(f"Error on training set: {np.round(error_train, 4)}")
-print(f"Error on test set: {np.round(error_test, 4)}")
-
-# Visualize test predictions
-# Plot the test predictions
-fig = plt.figure(figsize=(8, 6))
-plt.title("Dataset in blue, predictions for test set in orange")
-plt.scatter(X_train, y_train)
-plt.scatter(X_test, y_p_test)
-plt.xlabel("First feature")
-plt.ylabel("Second feature")
-plt.show()
-
-
 """
-Implementation of gradient descent algorithm for minimizing cost of a linear hypothesis
-function.
+Implementation of gradient descent algorithm for minimizing cost of a linear hypothesis function.
 """
 import numpy
 
@@ -140,7 +206,6 @@ test_data = (((515, 22, 13), 555), ((61, 35, 49), 150))
 parameter_vector = [2, 4, 1, 5]
 m = len(train_data)
 LEARNING_RATE = 0.009
-
 
 def _error(example_no, data_set="train"):
     """
