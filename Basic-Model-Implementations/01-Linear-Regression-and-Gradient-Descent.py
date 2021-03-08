@@ -1,3 +1,152 @@
+"""A collection of common linear models."""
+
+import numpy as np
+from ..utils.testing import is_symmetric_positive_definite, is_number
+
+
+class LinearRegression:
+    def __init__(self, fit_intercept=True):
+        r"""
+        An ordinary least squares regression model fit via the normal equation.
+        Notes
+        -----
+        Given data matrix *X* and target vector *y*, the maximum-likelihood estimate
+        for the regression coefficients, :math:`\\beta`, is:
+        .. math::
+            \hat{\beta} =
+                \left(\mathbf{X}^\top \mathbf{X}\right)^{-1} \mathbf{X}^\top \mathbf{y}
+        Parameters
+        ----------
+        fit_intercept : bool
+            Whether to fit an additional intercept term in addition to the
+            model coefficients. Default is True.
+        """
+        self.beta = None
+        self.fit_intercept = fit_intercept
+
+    def fit(self, X, y):
+        """
+        Fit the regression coefficients via maximum likelihood.
+        Parameters
+        ----------
+        X : :py:class:`ndarray <numpy.ndarray>` of shape `(N, M)`
+            A dataset consisting of `N` examples, each of dimension `M`.
+        y : :py:class:`ndarray <numpy.ndarray>` of shape `(N, K)`
+            The targets for each of the `N` examples in `X`, where each target
+            has dimension `K`.
+        """
+        # convert X to a design matrix if we're fitting an intercept
+        if self.fit_intercept:
+            X = np.c_[np.ones(X.shape[0]), X]
+
+        pseudo_inverse = np.linalg.inv(X.T @ X) @ X.T
+        self.beta = np.dot(pseudo_inverse, y)
+
+    def predict(self, X):
+        """
+        Use the trained model to generate predictions on a new collection of
+        data points.
+        Parameters
+        ----------
+        X : :py:class:`ndarray <numpy.ndarray>` of shape `(Z, M)`
+            A dataset consisting of `Z` new examples, each of dimension `M`.
+        Returns
+        -------
+        y_pred : :py:class:`ndarray <numpy.ndarray>` of shape `(Z, K)`
+            The model predictions for the items in `X`.
+        """
+        # convert X to a design matrix if we're fitting an intercept
+        if self.fit_intercept:
+            X = np.c_[np.ones(X.shape[0]), X]
+        return np.dot(X, self.beta)
+
+###########################################################
+# from sklearn.linear_model import LinearRegression
+###########################################################
+from sklearn.linear_model import LinearRegression
+lin_reg = LinearRegression()
+lin_reg.fit(X, y)
+lin_reg.intercept_, lin_reg.coef_
+
+###########################################################
+# import statsmodels.api as sm
+###########################################################
+import statsmodels.api as sm
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy.random import default_rng
+rng = default_rng(12345)
+
+# generate examples
+x = np.linspace(0, 5, 25)
+rng.shuffle(x)
+trend = 2.0
+shift = 5.0
+y1 = trend*x + shift + rng.normal(0, 0.5, size=25)
+y2 = trend*x + shift + rng.normal(0, 5, size=25)
+
+# plot data
+fig, ax = plt.subplots()
+ax.scatter(x, y1, c="b", label="Good correlation")
+ax.scatter(x, y2, c="r", label="Bad correlation")
+ax.legend()
+ax.set_xlabel("X"),
+ax.set_ylabel("Y")
+ax.set_title("Scatter plot of data with best fit lines")
+
+
+# fit OLS
+pred_x = sm.add_constant(x)
+model1 = sm.OLS(y1, pred_x).fit()
+print(model1.summary())
+
+model2 = sm.OLS(y2, pred_x).fit()
+print(model2.summary())
+
+model_x = sm.add_constant(np.linspace(0, 5))
+
+model_y1 = model1.predict(model_x)
+model_y2 = model2.predict(model_x)
+
+ax.plot(model_x[:, 1], model_y1, 'b')
+ax.plot(model_x[:, 1], model_y2, 'r')
+
+from numpy.random import default_rng
+rng = default_rng(12345)
+
+import statsmodels.api as sm
+
+p_vars = pd.DataFrame({
+"const": np.ones((100,)),
+"X1": rng.uniform(0, 15, size=100),
+"X2": rng.uniform(0, 25, size=100),
+"X3": rng.uniform(5, 25, size=100)
+})
+
+residuals = rng.normal(0.0, 12.0, size=100)
+Y = -10.0 + 5.0*p_vars["X1"] - 2.0*p_vars["X2"] + residuals
+
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharey=True,
+   tight_layout=True)
+ax1.scatter(p_vars["X1"], Y)
+ax2.scatter(p_vars["X2"], Y)
+ax3.scatter(p_vars["X3"], Y)
+
+ax1.set_title("Y against X1")
+ax1.set_xlabel("X1")
+ax1.set_ylabel("Y")
+ax2.set_title("Y against X2")
+ax2.set_xlabel("X2")
+ax3.set_title("Y against X3")
+ax3.set_xlabel("X3")
+
+model = sm.OLS(Y, p_vars).fit()
+print(model.summary())
+
+second_model = sm.OLS(Y, p_vars.loc[:, "const":"X2"]).fit()
+print(second_model.summary())
+
+
 ###########################################################
 # Training with normal equation
 ###########################################################
@@ -10,11 +159,6 @@ y = 4 + 3 * X + np.random.randn(n, 1)
 X_b = np.c_[np.ones((n, 1)), X]  # add x0 = 1 to each instance
 theta_best = np.linalg.inv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
 
-from sklearn.linear_model import LinearRegression
-
-lin_reg = LinearRegression()
-lin_reg.fit(X, y)
-lin_reg.intercept_, lin_reg.coef_
 
 ## X_train
 # To compute the parameters using the normal equation, we add a bias value
@@ -98,6 +242,7 @@ for epoch in range(n_iterations):
         eta = learning_schedule(t)
         theta = theta - eta * gradients
         theta_path_mgd.append(theta)
+
 
 ###########################################################
 ## LR Gradient Descent Class Implementations
