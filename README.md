@@ -1,3 +1,5 @@
+https://github.com/linghduoduo/Machine-Learning/blob/master/images/Screen%20Shot%202021-06-18%20at%208.38.54%20AM.png
+
 # Machine_Learning
 
 Boosting algorithms implement a sequential process where each model attempts to correct the mistakes of the previous models. The idea is to convert many weak learners into one strong learner. 
