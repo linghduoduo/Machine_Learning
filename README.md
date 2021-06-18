@@ -1,4 +1,4 @@
-https://github.com/linghduoduo/Machine-Learning/blob/master/images/Screen%20Shot%202021-06-18%20at%208.38.54%20AM.png
+![Machine Learning](https://github.com/linghduoduo/Machine-Learning/blob/master/images/Screen%20Shot%202021-06-18%20at%208.38.54%20AM.png)
 
 # Machine_Learning
 
